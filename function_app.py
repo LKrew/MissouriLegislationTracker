@@ -4,7 +4,7 @@ from shared import twitbot
 
 app = func.FunctionApp()
 
-@app.schedule(schedule="0 0 12 * * *", arg_name="myTimer", run_on_startup=False,
+@app.schedule(schedule="0 0 18 * * *", arg_name="myTimer", run_on_startup=False,
               use_monitor=False) 
 def MissouriLegislationTracker(myTimer: func.TimerRequest) -> None:
 
