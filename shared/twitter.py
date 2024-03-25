@@ -8,9 +8,8 @@ def create_post(bill):
     tweet_chunks = split_string_into_chunks(body, 280)
     return tweet_chunks
 
-def send_tweet(bill):
+def send_tweet(bill, client):
     x = 0
-    client = get_twitter_client()
     tweet_body = create_post(bill)
     for chunk in range(0, len(tweet_body)):
         if(chunk == 0):

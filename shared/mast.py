@@ -19,9 +19,8 @@ def create_post(bill):
     post_chunks = split_string_into_chunks(body, 500)
     return post_chunks
 
-def send_post_to_mastodon(bill):
+def send_post_to_mastodon(bill, client):
     x = 0
-    client = get_mastodon_client()
     post_body = create_post(bill)
     for chunk in range(0, len(post_body)):
         if(chunk == 0):

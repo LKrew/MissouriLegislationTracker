@@ -1,8 +1,8 @@
 import requests
 from .bill import Bill
-from .bsky import post_to_bsky
-from .twitter import send_tweet
-from .mast import send_post_to_mastodon
+from .bsky import post_to_bsky, get_client
+from .twitter import send_tweet, get_twitter_client
+from .mast import send_post_to_mastodon, get_mastodon_client
 from datetime import datetime, date
 import os
 from dotenv import load_dotenv
@@ -33,20 +33,23 @@ def main():
     bills = sorted(bills, key=lambda x: x.last_action_date)
     print(len(bills))
     logging.info(f'Todays Bills: {len(bills)}')
+    twitter_client = get_twitter_client()
+    mast_client = get_mastodon_client()
+    bsky_client = get_client()
     for bill in bills:
         try:
             logging.info("Posting to Twitter")
-            send_tweet(bill)
+            send_tweet(bill, twitter_client)
         except:
             logging.exception("Failed to Post to Twitter/X")
         try: 
             logging.info("Posting to Bsky")
-            post_to_bsky(bill)
+            post_to_bsky(bill, bsky_client)
         except:
             logging.exception("Failed to Post to Blue Sky")
         try:
             logging.info("Posting to Mastodon")
-            send_post_to_mastodon(bill)
+            send_post_to_mastodon(bill, mast_client)
         except:
             logging.exception("Failed to Post to Mastodon")
     logging.info("Completed Run")
