@@ -45,17 +45,17 @@ def main():
     for bill in bills:
         try:
             twitter_post_count += 1
-            send_tweet(bill, twitter_client)
+            #send_tweet(bill, twitter_client)
         except:
             logging.exception("Failed to Post to Twitter/X")
         try: 
             bsky_post_count += 1
-            post_to_bsky(bill, bsky_client)
+            #post_to_bsky(bill, bsky_client)
         except:
             logging.exception("Failed to Post to Blue Sky")
         try:
             mast_post_count += 1
-            send_post_to_mastodon(bill, mast_client)
+            #send_post_to_mastodon(bill, mast_client)
         except:
             logging.exception("Failed to Post to Mastodon")
     logging.info(f"Completed Run: \nTwitter Posts: {twitter_post_count} \nBsky Posts: {bsky_post_count}\nMastodon Posts: {mast_post_count}")
