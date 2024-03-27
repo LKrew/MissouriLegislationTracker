@@ -8,8 +8,8 @@ app = func.FunctionApp()
               use_monitor=False) 
 def MissouriLegislationTracker(myTimer: func.TimerRequest) -> None:
 
-    send_posts.post_bill()
-    logging.info('Run Completed')
+    run_result = send_posts.post_bill()
+    logging.info(run_result)
 
 @app.timer_trigger(schedule="0 0 */12 * * *", arg_name="myTimer", run_on_startup=False,
               use_monitor=False) 

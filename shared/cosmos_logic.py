@@ -33,8 +33,10 @@ def upsert_bill(container, bill):
         
 def get_next_bill(db):
     query =  "SELECT TOP 1 * FROM c ORDER BY c.created_date ASC"
-    bill = list(db.query_items(query=query, enable_cross_partition_query=True))[0]
-    return bill
+    bill = list(db.query_items(query=query, enable_cross_partition_query=True))
+    if len(bill) <= 0:
+        return None
+    return bill[0]
 
 def remove_bill(db, bill_id):
     try:

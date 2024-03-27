@@ -7,6 +7,8 @@ import logging
 def post_bill():
     db_client = get_cosmos_client()
     bill = get_next_bill(db_client)
+    if bill == None:
+        return "No Bill To Post"
     newline = '\n'
     sponsors = [f"{obj['name']} ({obj['partyAffiliation']}) district {obj['district']}" for obj in bill['sponsors']]
     body = f"{bill['number']}: {bill['title']} {newline}Last Action:{newline}- {bill['last_action']}{newline}- {bill['last_action_date']}{newline}Sponsors:{newline}- {(newline+'- ').join(sponsors)}{newline}{newline}More Info: {bill['state_link']}"
@@ -28,4 +30,5 @@ def post_bill():
     except:
         logging.exception("Failed to Post to Mastodon")
     remove_bill(db_client, bill['id'])
+    return "Run Completed"
     
