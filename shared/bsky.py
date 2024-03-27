@@ -27,9 +27,7 @@ def create_post(text_chunk):
             text_builder.text(chunk)
     return text_builder
 
-def post_to_bsky(bill, client):
-    newline = '\n'
-    body = f"{bill.number}: {bill.title} {newline}Last Action:{newline}- {bill.last_action}{newline}- {bill.last_action_date}{newline}Sponsors:{newline}- {(newline+'- ').join(bill.sponsors)}{newline}{newline}More Info: {bill.state_link}"
+def post_to_bsky(body, client):
     chunks = split_string_into_chunks(body, 300)
     parent = ''
     root = ''

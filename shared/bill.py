@@ -3,7 +3,7 @@ class Bill:
     def __init__(self, bill_id, number, change_hash, url, status_date,
                  status, last_action_date, last_action, title, description,
                  sponsors, text, state_link):
-        self.bill_id = bill_id
+        self.id = str(bill_id)
         self.number = number
         self.change_hash = change_hash
         self.url = url
@@ -13,14 +13,15 @@ class Bill:
         self.last_action = last_action
         self.title = title
         self.description = description
-        self.sponsors = sponsors
+        self.sponsors = [Sponsor(sponsor['name'], sponsor['party_affiliation'], sponsor['district']) for sponsor in sponsors]
         self.text = text
         self.state_link = state_link
+        self.created_date = None
         
     @classmethod
     def from_json(cls, json_data):
         bill = cls.__new__(cls)
-        bill.bill_id = json_data['bill_id']
+        bill.id = str(json_data['bill_id'])
         bill.number = json_data['number']
         bill.change_hash = json_data['change_hash']
         bill.url = json_data['url']
@@ -34,4 +35,8 @@ class Bill:
         bill.last_action_date = json_data['last_action_date']
         return bill
 
-        
+class Sponsor:
+    def __init__(self, name, party_affiliation, district):
+        self.name = name
+        self.party_affiliation = party_affiliation
+        self.district = district
