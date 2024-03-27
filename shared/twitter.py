@@ -2,15 +2,13 @@ import tweepy
 import os
 from .helpers import split_string_into_chunks
 
-def create_post(bill):
-    newline = '\n'
-    body = f"{bill.number}: {bill.title} {newline}Last Action:{newline}- {bill.last_action}{newline}- {bill.last_action_date}{newline}Sponsors:{newline}- {(newline+'-').join(bill.sponsors)}{newline}{newline}More Info: {bill.state_link}"#\n{bill.text}"
+def create_post(body):
     tweet_chunks = split_string_into_chunks(body, 280)
     return tweet_chunks
 
-def send_tweet(bill, client):
+def send_tweet(body, client):
     x = 0
-    tweet_body = create_post(bill)
+    tweet_body = create_post(body)
     for chunk in range(0, len(tweet_body)):
         if(chunk == 0):
             x = client.create_tweet(text = tweet_body[chunk])[0]['id']

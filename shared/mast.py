@@ -12,16 +12,13 @@ def get_mastodon_client():
         api_base_url='https://mastodon.social')
     return mastodon
 
-def create_post(bill):
-    newline = '\n'
-    tab = '\t'
-    body = f"{bill.number}: {bill.title} {newline}Last Action:{newline}- {bill.last_action}{newline}- {bill.last_action_date}{newline}Sponsors:{newline}- {(newline+'- ').join(bill.sponsors)}{newline}{newline}More Info: {bill.state_link}"
+def create_post(body):
     post_chunks = split_string_into_chunks(body, 500)
     return post_chunks
 
-def send_post_to_mastodon(bill, client):
+def send_post_to_mastodon(body, client):
     x = 0
-    post_body = create_post(bill)
+    post_body = create_post(body)
     for chunk in range(0, len(post_body)):
         if(chunk == 0):
             x = client.status_post(post_body[chunk])
