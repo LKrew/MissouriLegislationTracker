@@ -14,6 +14,6 @@ def MissouriLegislationTracker(myTimer: func.TimerRequest) -> None:
 @app.timer_trigger(schedule="0 0 18 * * *", arg_name="myTimer", run_on_startup=False,
               use_monitor=False) 
 def PopulateDb(myTimer: func.TimerRequest) -> None:
-    logging.info("Getting New Bill")
+    logging.info("Getting New Bills")
     get_bills.main()
     logging.info("Bills Uploaded to DB")

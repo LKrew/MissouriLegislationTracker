@@ -1,13 +1,6 @@
 import json
-from typing import Any
 import requests
-import azure.cosmos.cosmos_client as cosmos_client
-import azure.cosmos.exceptions as exceptions
-from azure.cosmos.partition_key import PartitionKey
 from .bill import Bill, Sponsor
-from .bsky import post_to_bsky, get_client
-from .twitter import send_tweet, get_twitter_client
-from .mast import send_post_to_mastodon, get_mastodon_client
 from .cosmos_logic import get_cosmos_client, upsert_bill
 from .CustomJSONEncoder import CustomJSONEncoder
 from datetime import datetime, date
@@ -17,7 +10,15 @@ import logging
 
 def main():
     logging.info(f'Starting Run: {date.today()}')
-    target_strings = ["third read", "passed", "passes", "introduced" ]
+    target_strings = ["First Read",
+                      "Third Read and Passed",
+                      "Introduced",
+                      "Voted Do Pass",
+                      "Bill Combined"]
+    
+    excluded_strings = ["Informal",
+                        "Calendar"]
+    
     api_key = os.environ['LEGISCAN_API_KEY']
     api_url = f"https://api.legiscan.com/?key={api_key}&op="
     get_session_list_uri = "getSessionList&state=MO"
@@ -33,8 +34,8 @@ def main():
         bill = Bill.from_json(b[1])
         bill_id = bill.id
         if(datetime.strptime(bill.last_action_date, '%Y-%m-%d').date() == date.today()):
-            for target_string in target_strings:
-                if target_string in bill.last_action.lower():  
+            if any(target in bill.last_action for target in target_strings):
+                if not any(excluded in bill.last_action for excluded in excluded_strings): 
                     response = requests.get(api_url + get_bill_uri + str(bill_id))
                     if response.status_code == 200:
                         bill_details = response.json()['bill']
