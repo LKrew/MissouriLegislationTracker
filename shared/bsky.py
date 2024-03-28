@@ -7,22 +7,15 @@ import re
 def create_post(text_chunk):
     text_builder = client_utils.TextBuilder()
     newline = '\n'
-    url_pattern = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-    matches = list(re.finditer(url_pattern, text_chunk))
-    partial_chunks = []
-    start = 0
-    for match in matches:
-        url = match.group()
-        end = match.start()
-        partial_chunks.append(text_chunk[start:end])
-        partial_chunks.append(url)
-        start = match.end()
-    if len(partial_chunks) == 0:
-        text_builder.text(text_chunk)
-        return text_builder
-    for chunk in partial_chunks:
+    url_pattern = r"(?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’])"
+    hashtag_pattern = r"#\w+"
+    result = re.split(f'({hashtag_pattern}|{url_pattern})', text_chunk)
+    result = [item for item in result if item]
+    for chunk in result:
         if re.search(url_pattern, chunk):
             text_builder.link(chunk, chunk)
+        elif re.search(hashtag_pattern, chunk):
+            text_builder.tag(chunk, chunk[1:])
         else:
             text_builder.text(chunk)
     return text_builder
