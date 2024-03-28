@@ -17,7 +17,7 @@ import logging
 
 def main():
     logging.info(f'Starting Run: {date.today()}')
-    target_strings = ["third read", "passed", "passes", "perfect", "introduced" ]
+    target_strings = ["third read", "passed", "passes", "introduced" ]
     api_key = os.environ['LEGISCAN_API_KEY']
     api_url = f"https://api.legiscan.com/?key={api_key}&op="
     get_session_list_uri = "getSessionList&state=MO"
