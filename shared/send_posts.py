@@ -11,7 +11,7 @@ def post_bill():
         return "No Bill To Post"
     newline = '\n'
     sponsors = [f"{obj['name']} ({obj['partyAffiliation']}) district {obj['district']}" for obj in bill['sponsors']]
-    body = f"{bill['number']}: {bill['title']} {newline}Last Action:{newline}- {bill['last_action']}{newline}- {bill['last_action_date']}{newline}Sponsors:{newline}- {(newline+'- ').join(sponsors)}{newline}{newline}More Info: {bill['state_link']}"
+    body = f"{bill['number']}: {bill['title']} {newline}Last Action:{newline}- {bill['last_action']}{newline}- {bill['last_action_date']}{newline}Sponsors:{newline}- {(newline+'- ').join(sponsors)}{newline} #moleg #mogov {newline}More Info: {bill['state_link']}"
     
     twitter_client = get_twitter_client()
     mast_client = get_mastodon_client()
