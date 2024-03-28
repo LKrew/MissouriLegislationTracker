@@ -27,8 +27,8 @@ def get_cosmos_client():
 def upsert_bill(container, bill):
     try:
         logging.info("Uploading Bill")
-        container.upsert_bill(body=bill)
-    except:
+        container.upsert_item(body=bill)
+    except Exception as ex:
         logging.info(f"Failed to Upload {bill}")
         
 def get_next_bill(db):
