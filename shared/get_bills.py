@@ -13,7 +13,7 @@ def main():
     target_strings = ["First Read",
                       "Third Read and Passed",
                       "Introduced",
-                      "Voted Do Pass",
+                      "Do Pass",
                       "Bill Combined"]
     
     excluded_strings = ["Informal",
