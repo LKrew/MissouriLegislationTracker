@@ -33,15 +33,18 @@ def main():
         if b[0] == 'session': continue
         bill = Bill.from_json(b[1])
         bill_id = bill.id
-        if(datetime.strptime(bill.last_action_date, '%Y-%m-%d').date() == date.today()):
-            if any(target in bill.last_action for target in target_strings):
-                if not any(excluded in bill.last_action for excluded in excluded_strings): 
-                    response = requests.get(api_url + get_bill_uri + str(bill_id))
-                    if response.status_code == 200:
-                        bill_details = response.json()['bill']
-                        bill.state_link = bill_details['state_link']
-                        bill.sponsors = [Sponsor(person['name'], person['party'], person['district']) for person in bill_details['sponsors']]
-                        bills.append(bill)
+        try:
+            if(datetime.strptime(bill.last_action_date, '%Y-%m-%d').date() == date.today()):
+                if any(target in bill.last_action for target in target_strings):
+                    if not any(excluded in bill.last_action for excluded in excluded_strings): 
+                        response = requests.get(api_url + get_bill_uri + str(bill_id))
+                        if response.status_code == 200:
+                            bill_details = response.json()['bill']
+                            bill.state_link = bill_details['state_link']
+                            bill.sponsors = [Sponsor(person['name'], person['party'], person['district']) for person in bill_details['sponsors']]
+                            bills.append(bill)
+        except:
+            logging.info(f'Error Processing Bill: {bill.id}')
     bills = sorted(bills, key=lambda x: x.last_action_date)
     logging.info(f'Todays Bills: {len(bills)}')
     db_container = get_cosmos_client()

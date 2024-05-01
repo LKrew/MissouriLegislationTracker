@@ -1,4 +1,16 @@
 def split_string_into_chunks(long_string, max_chars):
+    """
+    Splits a given long string into chunks of maximum length `max_chars`. 
+    Each chunk is appended to a list and returned at the end. 
+    If the total number of chunks is greater than 1, the chunk count is appended to each chunk.
+    
+    :param long_string: The string to be split into chunks.
+    :type long_string: str
+    :param max_chars: The maximum length of each chunk.
+    :type max_chars: int
+    :return: A list of chunks, where each chunk is a substring of `long_string`.
+    :rtype: List[str]
+    """
     chunks = []
     current_chunk = ""
     max_chars_per_chunk = max_chars - len("(x/y) ")
