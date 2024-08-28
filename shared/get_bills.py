@@ -12,9 +12,11 @@ def main():
     logging.info(f'Starting Run: {date.today()}')
     target_strings = ["First Read",
                       "Third Read and Passed",
-                      "Introduced",
-                      "Do Pass",
-                      "Bill Combined"]
+                      "Truly Agreed To and Finally Passed",
+                      "Signed by Senate President Pro Tem",
+                      "Signed by House Speaker",
+                      "Delivered to Governor",
+                      "Signed by Governor"]
     
     excluded_strings = ["Informal",
                         "Calendar"]
