@@ -16,7 +16,9 @@ def main():
                       "Signed by Senate President Pro Tem",
                       "Signed by House Speaker",
                       "Delivered to Governor",
-                      "Signed by Governor"]
+                      "Signed by Governor",
+                      "Governor took no action",
+                      "Delivered to Secretary of State"]
     
     excluded_strings = ["Informal",
                         "Calendar"]
