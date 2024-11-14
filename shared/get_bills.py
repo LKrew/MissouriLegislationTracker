@@ -10,7 +10,8 @@ import logging
 
 def main():
     logging.info(f'Starting Run: {date.today()}')
-    target_strings = ["First Read",
+    target_strings = ["Prefiled",
+                      "First Read",
                       "Third Read and Passed",
                       "Truly Agreed To and Finally Passed",
                       "Signed by Senate President Pro Tem",
