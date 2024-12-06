@@ -12,23 +12,22 @@ def post_bill():
     newline = '\n'
     sponsors = [f"{obj['name']} ({obj['partyAffiliation']}) district {obj['district']}" for obj in bill['sponsors']]
     body = f"{bill['number']}: {bill['title']} {newline}Last Action:{newline}- {bill['last_action']}{newline}- {bill['last_action_date']}{newline}Sponsors:{newline}- {(newline+'- ').join(sponsors)}{newline} {newline}More Info: {bill['state_link']}"
-    
-    twitter_client = get_twitter_client()
-    mast_client = get_mastodon_client()
-    bsky_client = get_client()
-    
+
     try:
+        twitter_client = get_twitter_client()
         send_tweet(body, twitter_client)
-    except:
-        logging.exception("Failed to Post to Twitter/X")
-    try: 
-        post_to_bsky(body, bsky_client)
-    except:
-        logging.exception("Failed to Post to Blue Sky")
+    except Exception as e : 
+        logging.exception('Twitter Failed: %s', e)
     try:
+        bsky_client = get_client() 
+        post_to_bsky(body, bsky_client)
+    except Exception as e:
+        logging.exception('Blue Sky Failed: %s', e)
+    try:
+        mast_client = get_mastodon_client()
         send_post_to_mastodon(body, mast_client)
-    except:
-        logging.exception("Failed to Post to Mastodon")
+    except Exception as e:
+        logging.exception('Mastodon Failed: %s', e)
     remove_bill(db_client, bill['id'])
     return "Run Completed"
     
