@@ -3,7 +3,7 @@ import requests
 from .bill import Bill, Sponsor
 from .cosmos_logic import get_cosmos_client, upsert_bill
 from .CustomJSONEncoder import CustomJSONEncoder
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import os
 from dotenv import load_dotenv
 import logging
@@ -33,6 +33,7 @@ def main():
     get_bill_uri = f"getBill&id="
     get_bill_list_uri = f'getMasterList&id={session_id}'
     bill_list = requests.get(api_url + get_bill_list_uri).json()['masterlist']
+    bill_list = dict(sorted(requests.get(api_url + get_bill_list_uri).json()['masterlist'].items(), key=lambda item: item[1].get('last_action_date', ''), reverse=True))
     bills = []
     for b in reversed(bill_list.items()):
         if b[0] == 'session': continue
@@ -48,7 +49,7 @@ def main():
                             bill.state_link = bill_details['state_link']
                             bill.sponsors = [Sponsor(person['name'], person['party'], person['district']) for person in bill_details['sponsors']]
                             bills.append(bill)
-        except:
+        except Exception as e:
             logging.info(f'Error Processing Bill: {bill.id}')
     bills = sorted(bills, key=lambda x: x.last_action_date)
     logging.info(f'Todays Bills: {len(bills)}')
