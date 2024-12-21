@@ -14,7 +14,7 @@ def post_bill():
     if len(sponsors) == 1:
         sponsor_string = f"Sponsor: {sponsors[0]}"
     else:
-        sponsor_string = f"Sponsors:\n- {(f"{newline}- ").join(sponsors)}"
+        sponsor_string = f"Sponsors:{newline}- {({newline}+'- ').join(sponsors)}"
     body = f"{bill['number']}: {bill['title']} {newline}Status: {bill['last_action']} {bill['last_action_date']}{newline}{sponsor_string}{newline}More Info: {bill['state_link']}"
     try:
         pass
