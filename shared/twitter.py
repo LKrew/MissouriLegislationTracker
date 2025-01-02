@@ -15,11 +15,11 @@ def send_tweet(body, client):
         else:
             x = client.create_tweet(text = tweet_body[chunk], in_reply_to_tweet_id=x)[0]['id']
             
-def get_twitter_client():
-    consumer_key = os.environ['MO_TWITTER_CONSUMER_KEY']
-    consumer_secret = os.environ['MO_TWITTER_CONSUMER_SECRET']
-    access_token = os.environ['MO_TWITTER_ACCESS_TOKEN']
-    access_token_secret = os.environ['ACCESS_TOKEN_SECRET']
+def get_twitter_client(account_config):
+    consumer_key = account_config.consumer_key #os.environ['MO_TWITTER_CONSUMER_KEY']
+    consumer_secret =account_config.consumer_secret #os.environ['MO_TWITTER_CONSUMER_SECRET']
+    access_token =account_config.access_token #os.environ['MO_TWITTER_ACCESS_TOKEN']
+    access_token_secret =account_config.access_token_secret #os.environ['ACCESS_TOKEN_SECRET']
     
     twitter_client = tweepy.Client(
         consumer_key = consumer_key,

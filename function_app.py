@@ -1,13 +1,13 @@
 import logging
 import azure.functions as func
 from shared import get_bills, send_posts
-from shared.account_config import AccountConfig, MOAccountConfig, USAccountConfig
+from shared.account_config import MOAccountConfig, USAccountConfig
 
 app = func.FunctionApp()
 ##############################################
-###################MISSOURI###################
+#                   MISSOURI                 #
 ##############################################
-@app.schedule(schedule="0 */5 * * * *", arg_name="myTimer", run_on_startup=False,
+@app.schedule(schedule="0 */20 * * * *", arg_name="myTimer", run_on_startup=False,
               use_monitor=False) 
 def MissouriLegislationTracker(myTimer: func.TimerRequest) -> None:
     logging.info("Creating Post")
@@ -23,9 +23,9 @@ def PopulateMoDb(myTimer: func.TimerRequest) -> None:
     get_bills.main(account_config)
     logging.info("Bills Uploaded to MO DB")
     
-##############################################
-###################US CONGRESS################
-##############################################    
+#####################################
+#           US CONGRESS             #
+#####################################   
 @app.schedule(schedule="0 */20 * * * *", arg_name="myTimer", run_on_startup=False,
               use_monitor=False) 
 def USCongressTracker(myTimer: func.TimerRequest) -> None:

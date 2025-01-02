@@ -55,12 +55,12 @@ def format_us_bill_body(bill: Bill):
 
 def get_sponsor_counts(sponsors):
     party_counts = {
-        PoliticalParty.R.name: 0,
-        PoliticalParty.D.name: 0,
-        PoliticalParty.IND.name: 0,
-        PoliticalParty.L.name: 0,
-        PoliticalParty.G.name: 0,
-        PoliticalParty.NP.name: 0,
+        PoliticalParty.REPUBLICAN.name: 0,
+        PoliticalParty.DEMOCRAT.name: 0,
+        PoliticalParty.INDEPENDENT.name: 0,
+        PoliticalParty.LIBERTARIAN.name: 0,
+        PoliticalParty.GREEN_PARTY.name: 0,
+        PoliticalParty.NONPARTISAN.name: 0,
         'OTHER': 0
     }
     total = len(sponsors)
@@ -78,27 +78,30 @@ def get_sponsor_counts(sponsors):
             party_counts_list.append((count, party))
     newline = '\n'
     party_counts_list.sort(reverse=True, key=lambda x: x[0])
-    party_counts = f'{newline}- '.join([f'{party}: {count}' for count, party in party_counts_list])
+    party_counts = f'{newline}- '.join([f'{party.title()}: {count}' for count, party in party_counts_list])
     
     sponsor_string = f'Sponsors:{newline}- {party_counts}'
     return sponsor_string
 
 def post_to_platforms(body, account_config):
     try:
-        twitter_client = get_twitter_client()
-        send_tweet(body, twitter_client)
+        if account_config.consumer_key:
+            twitter_client = get_twitter_client(account_config)
+            send_tweet(body, twitter_client)
     except Exception as e:
         logging.exception('Twitter Failed: %s', e)
     
     try:
-        bsky_client = get_client(account_config)
-        post_to_bsky(body, bsky_client)
+        if account_config.bsky_user:
+            bsky_client = get_client(account_config)
+            post_to_bsky(body, bsky_client)
     except Exception as e:
         logging.exception('Blue Sky Failed: %s', e)
     
     try:
-        mast_client = get_mastodon_client()
-        send_post_to_mastodon(body, mast_client)
+        if account_config.mast_access_token:
+            mast_client = get_mastodon_client(account_config)
+            send_post_to_mastodon(body, mast_client)
     except Exception as e:
         logging.exception('Mastodon Failed: %s', e)
     

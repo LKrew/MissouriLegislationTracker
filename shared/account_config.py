@@ -19,10 +19,12 @@ class USAccountConfig(AccountConfig):
         #BSKY
         self.bsky_user = os.getenv('US_BSKY_USER')
         self.bsky_password = os.getenv('US_BSKY_PASSWORD')
+        
         #Mastodon
         # self.mast_client_id = os.getenv('US_MAST_CLIENT_ID')
         # self.mast_client_secret = os.getenv('US_MAST_CLIENT_SECRET')
         # self.mast_access_token = os.getenv('US_MAST_ACCESS_TOKEN')
+        
         # #Twitter
         # self.consumer_key = os.environ['US_TWITTER_CONSUMER_KEY']
         # self.consumer_secret = os.environ['US_TWITTER_CONSUMER_SECRET']

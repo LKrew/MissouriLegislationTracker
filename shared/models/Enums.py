@@ -38,22 +38,14 @@ class MimeType(Enum):
     RTF = 5
     MS_WORD_2007 = 6
 
-# class PoliticalParty(Enum):
-#     DEMOCRAT = 1
-#     REPUBLICAN = 2
-#     INDEPENDENT = 3
-#     GREEN_PARTY = 4
-#     LIBERTARIAN = 5
-#     NONPARTISAN = 6
-    
 class PoliticalParty(Enum):
-    D = 1
-    R = 2
-    IND = 3
-    G = 4
-    L = 5
-    NP = 6
-
+    DEMOCRAT = 1
+    REPUBLICAN = 2
+    INDEPENDENT = 3
+    GREEN_PARTY = 4
+    LIBERTARIAN = 5
+    NONPARTISAN = 6
+    
 class Reason(Enum):
     NEWBILL = 1
     STATUS_CHANGE = 2
