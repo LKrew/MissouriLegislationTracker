@@ -16,9 +16,9 @@ def send_tweet(body, client):
             x = client.create_tweet(text = tweet_body[chunk], in_reply_to_tweet_id=x)[0]['id']
             
 def get_twitter_client():
-    consumer_key = os.environ['TWITTER_CONSUMER_KEY']
-    consumer_secret = os.environ['TWITTER_CONSUMER_SECRET']
-    access_token = os.environ['TWITTER_ACCESS_TOKEN']
+    consumer_key = os.environ['MO_TWITTER_CONSUMER_KEY']
+    consumer_secret = os.environ['MO_TWITTER_CONSUMER_SECRET']
+    access_token = os.environ['MO_TWITTER_ACCESS_TOKEN']
     access_token_secret = os.environ['ACCESS_TOKEN_SECRET']
     
     twitter_client = tweepy.Client(

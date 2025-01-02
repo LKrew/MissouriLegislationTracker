@@ -1,28 +1,35 @@
 import logging
+import asyncio
 import azure.cosmos.cosmos_client as cosmos_client
 import azure.cosmos.exceptions as exceptions
 from azure.cosmos.partition_key import PartitionKey
 import os
 
-def get_cosmos_client():
+def get_cosmos_client(account_config):
     db_client = cosmos_client.CosmosClient(os.environ['ACCOUNT_HOST'], os.environ['ACCOUNT_KEY'])
-    try: 
-        database = db_client.create_database(os.environ["COSMOS_DATABASE"])
-        logging.info("Databse Created")
-    except exceptions.CosmosResourceExistsError:
-        logging.info("Database Already Exists Connecting to Db")
-        database = db_client.get_database_client(os.environ["COSMOS_DATABASE"])
+    database_name = account_config.db_name
+    container_name = account_config.container_name
+
     try:
-        container = database.create_container(
-            id = os.environ["COSMOS_CONTAINER"],
+        database = db_client.create_database_if_not_exists(id=database_name)
+        logging.info("Database created or already exists")
+    except exceptions.CosmosHttpResponseError as e:
+        logging.error(f"Failed to create or connect to database: {e}")
+        raise
+
+    try:
+        container = database.create_container_if_not_exists(
+            id=container_name,
             partition_key=PartitionKey(path='/id'),
             offer_throughput=400
         )
-        logging.info("Container Created Successfully")
-    except exceptions.CosmosResourceExistsError:
-        logging.info("Container Already Exists Connecting to Existing Container")
-        container = database.get_container_client(os.environ["COSMOS_CONTAINER"])
+        logging.info("Container created or already exists")
+    except exceptions.CosmosHttpResponseError as e:
+        logging.error(f"Failed to create or connect to container: {e}")
+        raise
+
     return container
+
 
 def upsert_bill(container, bill):
     try:
@@ -41,7 +48,7 @@ def get_next_bill(db):
 def remove_bill(db, bill_id):
     try:
         logging.info(f"Deleting Item {bill_id}")
-        db.delete_item(item=bill_id, partition_key=bill_id)
+        db.delete_item(item=str(bill_id), partition_key=bill_id)
         logging.info("Successfully Deleted")
-    except:
-        logging.info(f"Failed to Delete Item {bill_id}")
+    except Exception as ex:
+        logging.error(f"Failed to Delete Item {bill_id}: {ex}")
