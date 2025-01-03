@@ -10,11 +10,11 @@ from .models.Bill import Bill
     
 def post_bill(account_config):
     db_client = get_cosmos_client(account_config)
-    bill = Bill.from_json(get_next_bill(db_client))
+    bill = get_next_bill(db_client)
     
     if bill is None:
         return "No Bill To Post"
-    
+    bill = Bill.from_json(bill)
     if isinstance(account_config, USAccountConfig):
         body = format_us_bill_body(bill)
     elif isinstance(account_config, MOAccountConfig):
