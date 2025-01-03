@@ -1,14 +1,11 @@
 from mastodon import Mastodon
 from .helpers import split_string_into_chunks
 import os
-def get_mastodon_client():
-    mast_client_id = os.environ['MAST_CLIENT_ID']
-    mast_client_secret = os.environ['MAST_CLIENT_SECRET']
-    mast_access_token = os.environ['MAST_ACCESS_TOKEN']
+def get_mastodon_client(account_config):
     mastodon = Mastodon(
-        client_id = mast_client_id,
-        client_secret = mast_client_secret,
-        access_token = mast_access_token,
+        client_id = account_config.mast_client_id,
+        client_secret = account_config.mast_client_secret,
+        access_token = account_config.mast_access_token,
         api_base_url='https://mastodon.social')
     return mastodon
 

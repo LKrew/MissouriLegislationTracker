@@ -1,4 +1,5 @@
 from atproto import Client, client_utils, models
+from .account_config import AccountConfig, MOAccountConfig, USAccountConfig
 import os
 from .helpers import split_string_into_chunks
 import re
@@ -36,10 +37,10 @@ def post_to_bsky(body, client):
                 ))
             root = parent
 
-def get_client():
+def get_client(account_config):
     bsky_client = Client()
     bsky_client.login(
-        os.environ['BSKY_USER']#'molegtracker.bsky.social'
-        , os.environ['BSKY_PASSWORD']#'Lkrew005!'
+        account_config.bsky_user#'molegtracker.bsky.social'
+        , account_config.bsky_password#'Lkrew005!'
         )
     return bsky_client
