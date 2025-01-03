@@ -30,6 +30,15 @@ def get_cosmos_client(account_config):
 
     return container
 
+def get_bill_by_id(container, bill_id: str):
+    query = f"SELECT * FROM c WHERE c.bill_id = {bill_id}"
+    bills = list(container.query_items(query=query, enable_cross_partition_query=True))
+    return bills[0] if bills else None
+
+def get_all_bill_states(container):
+    query = "SELECT c.bill_id, c.change_hash FROM c"
+    bills = list(container.query_items(query=query, enable_cross_partition_query=True))
+    return bills if bills else None
 
 def upsert_bill(container, bill):
     try:
@@ -39,7 +48,7 @@ def upsert_bill(container, bill):
         logging.info(f"Failed to Upload {bill}")
         
 def get_next_bill(db):
-    query =  "SELECT TOP 1 * FROM c ORDER BY c.created_date ASC"
+    query =  "SELECT TOP 1 * FROM c WHERE c.posted = false ORDER BY c.created_date ASC"
     bill = list(db.query_items(query=query, enable_cross_partition_query=True))
     if len(bill) <= 0:
         return None

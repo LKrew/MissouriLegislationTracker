@@ -1,8 +1,9 @@
+from datetime import datetime, timezone
 from shared.models.Enums import PoliticalParty
 from .bsky import post_to_bsky, get_client
 from .twitter import send_tweet, get_twitter_client
 from .mast import send_post_to_mastodon, get_mastodon_client
-from .cosmos_logic import get_cosmos_client, remove_bill, get_next_bill
+from .cosmos_logic import get_cosmos_client, remove_bill, get_next_bill, upsert_bill
 from .account_config import USAccountConfig, MOAccountConfig
 import logging
 from .models.Bill import Bill
@@ -10,9 +11,10 @@ from .models.Bill import Bill
 def post_bill(account_config):
     db_client = get_cosmos_client(account_config)
     bill = Bill.from_json(get_next_bill(db_client))
+    
     if bill is None:
         return "No Bill To Post"
-
+    
     if isinstance(account_config, USAccountConfig):
         body = format_us_bill_body(bill)
     elif isinstance(account_config, MOAccountConfig):
@@ -22,12 +24,18 @@ def post_bill(account_config):
     
     post_to_platforms(body, account_config)
     
-    remove_bill(db_client, bill.bill_id)
+    bill.posted = True
+    bill.posted_date = datetime.now(timezone.utc).isoformat()
+    updated_bill = bill.to_dict()
+    updated_bill['id'] = str(bill.bill_id)
+    upsert_bill(db_client, updated_bill)
+    #no longer deleting
+    #remove_bill(db_client, bill.bill_id)
     return "Run Completed"
 
 def format_state_bill_body(bill: Bill):
     newline = '\n'
-    sponsors = [f"{obj.person.name} ({obj.person.party}) district {obj.person.district}" for obj in bill.sponsors]
+    sponsors = [f"{obj.person.name} ({obj.person.party[0]}) district {obj.person.district}" for obj in bill.sponsors]
     if len(sponsors) == 1:
         sponsor_string = f"Sponsor: {sponsors[0]}"
     else:

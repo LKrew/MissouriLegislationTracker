@@ -15,7 +15,7 @@ def MissouriLegislationTracker(myTimer: func.TimerRequest) -> None:
     run_result = send_posts.post_bill(account_config)
     logging.info(run_result)
 
-@app.timer_trigger(schedule="0 0 23 * * *", arg_name="myTimer", run_on_startup=False,
+@app.timer_trigger(schedule="0 0 * * * *", arg_name="myTimer", run_on_startup=False,
               use_monitor=False) 
 def PopulateMoDb(myTimer: func.TimerRequest) -> None:
     logging.info("Getting New Missouri Bills")
@@ -34,7 +34,7 @@ def USCongressTracker(myTimer: func.TimerRequest) -> None:
     run_result = send_posts.post_bill(account_config)
     logging.info(run_result)
 
-@app.timer_trigger(schedule="0 0 23 * * *", arg_name="myTimer", run_on_startup=False,
+@app.timer_trigger(schedule="0 0 * * * *", arg_name="myTimer", run_on_startup=False,
               use_monitor=False) 
 def PopulateUsDb(myTimer: func.TimerRequest) -> None:
     logging.info("Getting New Federal Bills")

@@ -52,7 +52,7 @@ class Bill:
 
     @classmethod
     def from_json(cls, data: dict) -> 'Bill':
-        return cls(
+        bill = cls(
             bill_id=data.get('bill_id'),
             number=data.get('number'),
             change_hash=data.get('change_hash'),
@@ -89,6 +89,9 @@ class Bill:
             supplements=[Supplement.from_json(supplement) for supplement in data.get('supplements', [])] if 'supplements' in data else [],
             calendar=[CalendarEvent.from_json(event) for event in data.get('calendar', [])] if 'calendar' in data else []
         )
+        bill.posted = data.get('posted', False)
+        bill.posted_date = data.get('posted_date')
+        return bill
 
     def update_from_json(self, data: dict) -> None:
         self.bill_id = data.get('bill_id', self.bill_id)
@@ -126,7 +129,9 @@ class Bill:
         self.amendments = [Amendment.from_json(amendment) for amendment in data.get('amendments', [])] if 'amendments' in data else self.amendments
         self.supplements = [Supplement.from_json(supplement) for supplement in data.get('supplements', [])] if 'supplements' in data else self.supplements
         self.calendar = [CalendarEvent.from_json(event) for event in data.get('calendar', [])] if 'calendar' in data else self.calendar
-
+        self.posted = data.get('posted', self.posted)
+        self.posted_date = data.get('posted_date', self.posted_date)
+        
     def to_dict(self) -> dict:
         return {
             'bill_id': self.bill_id,
@@ -163,5 +168,12 @@ class Bill:
             'votes': [vote.to_dict() for vote in self.votes],
             'amendments': [amendment.to_dict() for amendment in self.amendments],
             'supplements': [supplement.to_dict() for supplement in self.supplements],
-            'calendar': [event.to_dict() for event in self.calendar]
+            'calendar': [event.to_dict() for event in self.calendar],
+            'posted': self.posted,
+            'posted_date': self.posted_date
         }
+        
+    def mark_as_posted(self) -> None:
+        from datetime import datetime
+        self.posted = True
+        self.posted_date = datetime.now(datetime.timezone.utc).isoformat()

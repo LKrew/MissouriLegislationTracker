@@ -33,7 +33,10 @@ class USAccountConfig(AccountConfig):
         
         self.container_name = os.getenv('US_COSMOS_CONTAINER')
         self.legiscan_state_id = os.getenv('LEGISCAN_STATE_ID_US')
-        self.target_actions = ["Social Security"]
+        self.target_actions = ["Became Public Law",
+                               "Signed by President",
+                               "Introduced in House",
+                               ]
         self.excluded_actions = ["Informal", "Calendar"]
         
     def __repr__(self):
@@ -52,10 +55,10 @@ class MOAccountConfig(AccountConfig):
         self.mast_client_secret = os.getenv('MO_MAST_CLIENT_SECRET')
         self.mast_access_token = os.getenv('MO_MAST_ACCESS_TOKEN')
         #Twitter
-        self.consumer_key = os.environ['MO_TWITTER_CONSUMER_KEY']
-        self.consumer_secret = os.environ['MO_TWITTER_CONSUMER_SECRET']
-        self.access_token = os.environ['MO_TWITTER_ACCESS_TOKEN']
-        self.access_token_secret = os.environ['MO_TWITTER_ACCESS_TOKEN_SECRET']
+        self.consumer_key = os.getenv('MO_TWITTER_CONSUMER_KEY')
+        self.consumer_secret = os.getenv('MO_TWITTER_CONSUMER_SECRET')
+        self.access_token = os.getenv('MO_TWITTER_ACCESS_TOKEN')
+        self.access_token_secret = os.getenv('MO_TWITTER_ACCESS_TOKEN_SECRET')
         
         self.container_name = os.getenv('MO_COSMOS_CONTAINER')
         self.legiscan_state_id = os.getenv('LEGISCAN_STATE_ID_MO')

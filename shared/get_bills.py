@@ -1,7 +1,7 @@
 import requests
 from .models.Bill import Bill
 from .account_config import AccountConfig
-from .cosmos_logic import get_cosmos_client, upsert_bill
+from .cosmos_logic import get_all_bill_states, get_cosmos_client, upsert_bill,get_bill_by_id
 from datetime import datetime, date, timedelta
 import logging
 
@@ -20,18 +20,34 @@ def get_latest_session_id(api_url, account_config):
 
 def get_bills_for_today(api_url, session_id, account_config):
     """Get the bills for today from the LegiScan API"""
+    db_container = get_cosmos_client(account_config)
     get_bill_list_uri = f'{api_url}{account_config.legiscan_masterlist_uri}{session_id}'
     bill_list = requests.get(get_bill_list_uri).json()['masterlist']
     bill_list = dict(sorted(bill_list.items(), key=lambda item: item[1].get('last_action_date', ''), reverse=True))
     bills = []
+    
+    stored_bill = get_all_bill_states(db_container)
+    change_hash_dict = {bill['bill_id']: bill['change_hash'] for bill in stored_bill}
     for b in reversed(bill_list.items()):
         if b[0] == 'session': continue
-        bill = Bill.from_json(b[1])
-        if is_bill_relevant_today(bill, account_config):
-            bill_details = get_bill_details(api_url, bill.bill_id, account_config)
+        
+        current_bill = Bill.from_json(b[1])
+        
+        needs_update = (
+            not current_bill.bill_id in change_hash_dict.keys() or
+            change_hash_dict[current_bill.bill_id] != current_bill.change_hash
+        )
+        in_dict = not current_bill.bill_id in change_hash_dict.keys()
+        if not in_dict:
+            hash_match = change_hash_dict[current_bill.bill_id] != current_bill.change_hash
+        
+        if needs_update:
+            bill_details = get_bill_details(api_url, current_bill.bill_id, account_config)
             if bill_details:
-                bill.update_from_json(bill_details)
-                bills.append(bill)
+                current_bill.update_from_json(bill_details)
+                current_bill.posted = False
+                current_bill.posted_date = None
+                bills.append(current_bill)
     return sorted(bills, key=lambda x: x.last_action_date)
 
 def is_bill_relevant_today(bill, account_config):
