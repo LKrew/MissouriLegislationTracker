@@ -41,7 +41,7 @@ def format_state_bill_body(bill: Bill):
     else:
         sponsor_string = f"Sponsors:{newline}- {(f'{newline}- ').join(sponsors)}"
     bill.texts.sort(key=lambda text: text.date, reverse=True)
-    most_recent_text = bill.texts[0].state_link if bill.texts else "No texts available"
+    most_recent_text = bill.texts[0].state_link if bill.texts else bill.state_link if bill.state_link else "No texts available"
     if bill.description != bill.title:
         description = f'{newline}Description: {description}'
     else:
