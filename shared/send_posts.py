@@ -54,7 +54,7 @@ def format_us_bill_body(bill: Bill):
     sponsor_string = get_sponsor_counts(bill.sponsors)
     bill.texts.sort(key=lambda text: text.date, reverse=True)
     if bill.description != bill.title:
-        description = f'{newline}Description: {bill.description}'
+        description = ""# f'{newline}Description: {bill.description}'
     else:
         description = ""
     most_recent_text = bill.texts[0].state_link if bill.texts else "No texts available"
