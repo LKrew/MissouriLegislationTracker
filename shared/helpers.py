@@ -1,53 +1,47 @@
-def split_string_into_chunks(long_string, max_chars):
-    """
-    Splits a given long string into chunks of maximum length `max_chars`. 
-    Each chunk is appended to a list and returned at the end. 
-    If the total number of chunks is greater than 1, the chunk count is appended to each chunk.
-    
-    :param long_string: The string to be split into chunks.
-    :type long_string: str
-    :param max_chars: The maximum length of each chunk.
-    :type max_chars: int
-    :return: A list of chunks, where each chunk is a substring of `long_string`.
-    :rtype: List[str]
-    """
+import json
+from pathlib import Path
+from models.Bill import Bill
+from send_posts import format_us_bill_body
+
+def split_string_into_chunks(long_string: str, max_chars: int) -> list[str]:
+    if len(long_string) <= max_chars:
+        return [long_string]
+        
     chunks = []
-    current_chunk = ""
-    max_chars_per_chunk = max_chars - len("(x/y) ")
-
-    while long_string:
-        # Find the index where the next chunk should end
-        index = max_chars_per_chunk
-        if '\n' in long_string[:index]:
-            index = long_string.index('\n') + 1
-        elif ' ' in long_string[:index]:
-            index = long_string.rindex(' ') + 1
-
-        # Extract the chunk and remove it from the long string
-        chunk = long_string[:index]
-        long_string = long_string[index:].lstrip()
-
-        # Append chunk
-        if current_chunk:
-            current_chunk += chunk
-        else:
-            current_chunk = chunk
-
-        # Check if adding this chunk exceeds the max_chars_per_chunk
-        if len(current_chunk) > max_chars_per_chunk:
-            chunks.append(current_chunk[:-len(chunk)])
-            current_chunk = chunk
-
-    # Append the last chunk
-    if current_chunk:
-        chunks.append(current_chunk)
-
-    # Calculate total number of chunks
-    total_chunks = len(chunks)
+    remaining_text = long_string
     
-    # Append chunk count if there is more than one chunk
-    if total_chunks > 1:
-        for i, chunk in enumerate(chunks):
-            chunks[i] = f"({i+1}/{total_chunks}) {chunk}"
-
+    # First calculate max prefix length for worst case
+    max_prefix_length = len(f"(XX/XX) ")  # Placeholder for max possible prefix
+    available_chars = max_chars - max_prefix_length
+    
+    while remaining_text:
+        if len(remaining_text) <= available_chars:
+            chunks.append(remaining_text)
+            break
+            
+        # Find break point
+        split_index = available_chars
+        
+        # Try to break at sentence
+        sentence_break = max(
+            remaining_text.rfind('. ', 0, split_index),
+            remaining_text.rfind('? ', 0, split_index),
+            remaining_text.rfind('! ', 0, split_index)
+        )
+        if sentence_break > available_chars * 0.5:
+            split_index = sentence_break + 1
+            
+        # Fall back to word break
+        elif (word_break := remaining_text.rfind(' ', 0, split_index)) != -1:
+            split_index = word_break
+            
+        chunk = remaining_text[:split_index].strip()
+        remaining_text = remaining_text[split_index:].strip()
+        chunks.append(chunk)
+    
+    # Add prefixes after knowing total chunk count
+    if len(chunks) > 1:
+        total = len(chunks)
+        chunks = [f"({i+1}/{total}) {chunk}" for i, chunk in enumerate(chunks)]
+        
     return chunks
