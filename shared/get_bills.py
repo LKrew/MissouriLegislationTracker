@@ -1,3 +1,4 @@
+from asyncio import sleep
 import requests
 from .models.Bill import Bill
 from .account_config import AccountConfig
@@ -27,7 +28,9 @@ def get_bills_for_today(api_url, session_id, account_config):
     bills = []
     
     stored_bill = get_all_bill_states(db_container)
-    change_hash_dict = {bill['bill_id']: bill['change_hash'] for bill in stored_bill}
+    change_hash_dict = {}
+    if(stored_bill):
+        change_hash_dict = {bill['bill_id']: bill['change_hash'] for bill in stored_bill}
     for b in reversed(bill_list.items()):
         if b[0] == 'session': continue
         
@@ -74,7 +77,11 @@ def process_bills(bills, account_config):
     logging.info(f'Todays Bills: {len(bills)}')
     db_container = get_cosmos_client(account_config)
     for bill in bills:
+        #if is_bill_relevant_today(bill, account_config):
         bill.created_date = datetime.now()
         bill_dict = bill.to_dict()
         bill_dict['id'] = str(bill_dict['bill_id'])
         upsert_bill(db_container, bill_dict)
+        count = 0
+        if(count % 50 == 0):
+            sleep(1)
