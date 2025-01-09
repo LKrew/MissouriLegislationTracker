@@ -24,7 +24,7 @@ def get_bills_for_today(api_url, session_id, account_config):
     db_container = get_cosmos_client(account_config)
     get_bill_list_uri = f'{api_url}{account_config.legiscan_masterlist_uri}{session_id}'
     bill_list = requests.get(get_bill_list_uri).json()['masterlist']
-    bill_list = dict(sorted(bill_list.items(), key=lambda item: item[1].get('last_action_date', ''), reverse=True))
+    #bill_list = dict(sorted(bill_list.items(), key=lambda item: item[1].get('last_action_date', ''), reverse=True))
     bills = []
     
     stored_bill = get_all_bill_states(db_container)
@@ -40,9 +40,6 @@ def get_bills_for_today(api_url, session_id, account_config):
             not current_bill.bill_id in change_hash_dict.keys() or
             change_hash_dict[current_bill.bill_id] != current_bill.change_hash
         )
-        in_dict = not current_bill.bill_id in change_hash_dict.keys()
-        if not in_dict:
-            hash_match = change_hash_dict[current_bill.bill_id] != current_bill.change_hash
         
         if needs_update:
             bill_details = get_bill_details(api_url, current_bill.bill_id, account_config)
@@ -51,7 +48,7 @@ def get_bills_for_today(api_url, session_id, account_config):
                 current_bill.posted = False
                 current_bill.posted_date = None
                 bills.append(current_bill)
-    return sorted(bills, key=lambda x: x.last_action_date)
+    return bills
 
 def is_bill_relevant_today(bill, account_config):
     """Check if a bill is relevant for posting today"""
