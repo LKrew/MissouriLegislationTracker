@@ -1,8 +1,3 @@
-import json
-from pathlib import Path
-from models.Bill import Bill
-from send_posts import format_us_bill_body
-
 def split_string_into_chunks(long_string: str, max_chars: int) -> list[str]:
     if len(long_string) <= max_chars:
         return [long_string]
