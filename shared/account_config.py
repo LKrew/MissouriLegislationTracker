@@ -16,6 +16,8 @@ class AccountConfig:
 class USAccountConfig(AccountConfig):
     def __init__(self):
         super().__init__()
+        self.code = "US"
+        
         #BSKY
         self.bsky_user = os.getenv('US_BSKY_USER')
         self.bsky_password = os.getenv('US_BSKY_PASSWORD')
@@ -47,6 +49,8 @@ class USAccountConfig(AccountConfig):
 class MOAccountConfig(AccountConfig):
     def __init__(self):
         super().__init__()
+        
+        self.code = "MO"
         #BSKY
         self.bsky_user = os.getenv('MO_BSKY_USER')
         self.bsky_password = os.getenv('MO_BSKY_PASSWORD')

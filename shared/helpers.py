@@ -6,7 +6,7 @@ def split_string_into_chunks(long_string: str, max_chars: int) -> list[str]:
     remaining_text = long_string
     
     # First calculate max prefix length for worst case
-    max_prefix_length = len(f"(XX/XX) ")  # Placeholder for max possible prefix
+    max_prefix_length = len(f"[XX/XX] ")  # Placeholder for max possible prefix
     available_chars = max_chars - max_prefix_length
     
     while remaining_text:
@@ -37,6 +37,6 @@ def split_string_into_chunks(long_string: str, max_chars: int) -> list[str]:
     # Add prefixes after knowing total chunk count
     if len(chunks) > 1:
         total = len(chunks)
-        chunks = [f"({i+1}/{total}) {chunk}" for i, chunk in enumerate(chunks)]
+        chunks = [f"[{i+1}/{total}] {chunk}" for i, chunk in enumerate(chunks)]
         
     return chunks
