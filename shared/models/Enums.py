@@ -45,6 +45,13 @@ class PoliticalParty(Enum):
     GREEN_PARTY = 4
     LIBERTARIAN = 5
     NONPARTISAN = 6
+class PartyCode(Enum):
+    D = 1
+    R = 2
+    IND = 3
+    G = 4
+    L = 5
+    NP = 6
     
 class Reason(Enum):
     NEWBILL = 1

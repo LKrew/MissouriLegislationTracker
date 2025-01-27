@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 from shared.models.Enums import PoliticalParty
-from .bsky import post_to_bsky, get_client
+from .bsky import get_client, detailed_post_to_bsky
 from .twitter import send_tweet, get_twitter_client
 from .mast import send_post_to_mastodon, get_mastodon_client
-from .cosmos_logic import get_cosmos_client, remove_bill, get_next_bill, upsert_bill
+from .cosmos_logic import get_cosmos_client, remove_bill, get_next_bill, upsert_bill, get_long_bill
 from .account_config import USAccountConfig, MOAccountConfig
 import logging
 from .models.Bill import Bill
@@ -22,15 +22,15 @@ def post_bill(account_config):
     else:
         raise ValueError("Unsupported account configuration")
     
-    post_to_platforms(body, account_config)
+    post_to_platforms(bill, account_config)
     
     bill.posted = True
     bill.posted_date = datetime.now(timezone.utc).isoformat()
     updated_bill = bill.to_dict()
     updated_bill['id'] = str(bill.bill_id)
     upsert_bill(db_client, updated_bill)
-    #no longer deleting
-    #remove_bill(db_client, bill.bill_id)
+    # no longer deleting
+    # remove_bill(db_client, bill.bill_id)
     return "Run Completed"
 
 def format_state_bill_body(bill: Bill):
@@ -91,7 +91,8 @@ def get_sponsor_counts(sponsors):
     sponsor_string = f'Sponsors:{newline}- {party_counts}'
     return sponsor_string
 
-def post_to_platforms(body, account_config):
+def post_to_platforms(bill, account_config):
+    body = format_us_bill_body(bill)
     try:
         if account_config.consumer_key:
             twitter_client = get_twitter_client(account_config)
@@ -102,7 +103,7 @@ def post_to_platforms(body, account_config):
     try:
         if account_config.bsky_user:
             bsky_client = get_client(account_config)
-            post_to_bsky(body, bsky_client)
+            detailed_post_to_bsky(bill, bsky_client, account_config)
     except Exception as e:
         logging.exception('Blue Sky Failed: %s', e)
     
