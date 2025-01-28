@@ -16,14 +16,6 @@ def post_bill(account_config):
         return "No Bill To Post"
     bill = Bill.from_json(bill)
     logging.info(f"Running send_posts.post_bill: on bill {bill.bill_number}")
-    if isinstance(account_config, USAccountConfig):
-        body = format_us_bill_body(bill)
-    elif isinstance(account_config, MOAccountConfig):
-        body = format_state_bill_body(bill)
-    else:
-        logging.error("Error Posting Bsky Bill send_posts.post_bill")
-        raise ValueError("Unsupported account configuration")
-    
     post_to_platforms(bill, account_config)
     
     bill.posted = True
@@ -31,8 +23,7 @@ def post_bill(account_config):
     updated_bill = bill.to_dict()
     updated_bill['id'] = str(bill.bill_id)
     upsert_bill(db_client, updated_bill)
-    # no longer deleting
-    # remove_bill(db_client, bill.bill_id)
+
     return "Run Completed"
 
 def format_state_bill_body(bill: Bill):
@@ -94,6 +85,7 @@ def get_sponsor_counts(sponsors):
     return sponsor_string
 
 def post_to_platforms(bill, account_config):
+    
     body = format_us_bill_body(bill)
     try:
         if account_config.consumer_key:
