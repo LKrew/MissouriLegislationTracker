@@ -3,7 +3,7 @@ from shared.models.Enums import PoliticalParty
 from .bsky import get_client, detailed_post_to_bsky
 from .twitter import send_tweet, get_twitter_client
 from .mast import send_post_to_mastodon, get_mastodon_client
-from .cosmos_logic import get_cosmos_client, remove_bill, get_next_bill, upsert_bill, get_long_bill
+from .cosmos_logic import get_cosmos_client, remove_bill, get_next_bill, upsert_bill
 from .account_config import USAccountConfig, MOAccountConfig
 import logging
 from .models.Bill import Bill
