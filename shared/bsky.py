@@ -1,3 +1,4 @@
+import logging
 from atproto import Client, client_utils, models
 from .account_config import AccountConfig, MOAccountConfig, USAccountConfig
 from .models.Bill import Bill
@@ -35,6 +36,7 @@ def get_sponsor_counts(sponsors):
     return sponsor_string
 
 def create_detailed_post(bill: Bill, account_config: AccountConfig):
+    logging.info(f'Creating detailed post for {bill.bill_number}')
     text_builder = client_utils.TextBuilder()
     newline = '\n'
     sponsor_label = f'Sponsors:{newline}' if len(bill.sponsors) > 1 else 'Sponsor: '
@@ -60,6 +62,7 @@ def create_detailed_post(bill: Bill, account_config: AccountConfig):
     return text_builder
 
 def detailed_post_to_bsky(bill: Bill, client: Client, account_config: AccountConfig):
+    logging.info(f'Starting detailed post to Bsky for {bill.bill_number}')
     state_link_embed = models.AppBskyEmbedExternal.Main(
         external = models.AppBskyEmbedExternal.External(
             title= f'More Info',
@@ -94,6 +97,7 @@ def detailed_post_to_bsky(bill: Bill, client: Client, account_config: AccountCon
                     root = parent
 
 def create_multi_posts(body, facets):
+    logging.ingo('Creating multi posts')
     chunks = split_string_into_chunks(body, 300)
     multi_posts = []
     chunk_indexes = [0]
