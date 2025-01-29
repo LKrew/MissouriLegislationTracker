@@ -32,6 +32,7 @@ def store_executive_orders(account_config):
         logging.info(f"Skipped Executive Order (Published Before Today): {executive_order.document_number}")
 
 def post_order(account_config):
+    logging.info("Running executive_order_handler.post_order")
     db_client = get_cosmos_client(account_config)
     order = get_next_order(db_client)
     
