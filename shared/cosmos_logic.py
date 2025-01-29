@@ -56,6 +56,11 @@ def upsert_executive_order(container, order):
     except Exception as ex:
         logging.error(f"Failed to Upload {order}")
 
+def get_all_orders(container):
+    query = "Select c.document_number FROM c"
+    orders = list(container.query_items(query=query, enable_cross_partition_query=True))
+    return orders
+
 def get_next_order(db):
     query =  "SELECT TOP 1 * FROM c WHERE c.posted = false ORDER BY c.created_date ASC"
     order = list(db.query_items(query=query, enable_cross_partition_query=True))
