@@ -81,3 +81,19 @@ class MOAccountConfig(AccountConfig):
     def __repr__(self):
         return (f"MOAccountConfig(db_name={self.db_name}, container_name={self.container_name}, "
                 f"mo_specific_config={self.mo_specific_config})")
+        
+class EOAccountConfig(AccountConfig):
+    def __init__(self):
+        super().__init__()
+        self.code = "EO"
+        
+        #BSKY
+        self.bsky_user = os.getenv('EO_BSKY_USER')
+        self.bsky_password = os.getenv('EO_BSKY_PASSWORD')
+        
+        self.container_name = os.getenv('EO_COSMOS_CONTAINER')
+        self.api_url = os.getenv('EO_API_URL')
+    
+    def __repr__(self):
+        return (f"MOAccountConfig(db_name={self.db_name}, container_name={self.container_name}, "
+                f"mo_specific_config={self.mo_specific_config})")

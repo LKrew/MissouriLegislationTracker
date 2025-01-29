@@ -40,23 +40,32 @@ def get_all_bill_states(container):
     return bills if bills else None
 
 def upsert_bill(container, bill):
+    logging.info(f"Upserting Bill: {bill['bill_id']}")
     try:
         logging.info("Uploading Bill")
         container.upsert_item(body=bill)
     except Exception as ex:
-        logging.info(f"Failed to Upload {bill}")
-        
+        logging.error(f"Failed to Upload {bill}")
+
+def upsert_executive_order(container, order):
+    logging.info(f"Upserting Executive Order: {order['document_number']}")
+    try:
+        logging.info("Uploading Executive Order")
+        order['id'] = order['document_number']
+        container.upsert_item(body=order)
+    except Exception as ex:
+        logging.error(f"Failed to Upload {order}")
+
+def get_next_order(db):
+    query =  "SELECT TOP 1 * FROM c WHERE c.posted = false ORDER BY c.created_date ASC"
+    order = list(db.query_items(query=query, enable_cross_partition_query=True))
+    if len(order) <= 0:
+        return None
+    return order[0]
+
 def get_next_bill(db):
     query =  "SELECT TOP 1 * FROM c WHERE c.posted = false ORDER BY c.created_date ASC"
     bill = list(db.query_items(query=query, enable_cross_partition_query=True))
     if len(bill) <= 0:
         return None
     return bill[0]
-
-def remove_bill(db, bill_id):
-    try:
-        logging.info(f"Deleting Item {bill_id}")
-        db.delete_item(item=str(bill_id), partition_key=bill_id)
-        logging.info("Successfully Deleted")
-    except Exception as ex:
-        logging.error(f"Failed to Delete Item {bill_id}: {ex}")
