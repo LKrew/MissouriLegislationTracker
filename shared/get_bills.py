@@ -27,18 +27,18 @@ def get_bills_for_today(api_url, session_id, account_config):
     #bill_list = dict(sorted(bill_list.items(), key=lambda item: item[1].get('last_action_date', ''), reverse=True))
     bills = []
     
-    stored_bill = get_all_bill_states(db_container)
-    change_hash_dict = {}
-    if(stored_bill):
-        change_hash_dict = {bill['bill_id']: bill['change_hash'] for bill in stored_bill}
+    stored_bills = get_all_bill_states(db_container)
+    last_action_dict = {}
+    if(stored_bills):
+        last_action_dict = {bill['bill_id']: bill['last_action'] for bill in stored_bills}
     for b in reversed(bill_list.items()):
         if b[0] == 'session': continue
         
         current_bill = Bill.from_json(b[1])
         
         needs_update = (
-            not current_bill.bill_id in change_hash_dict.keys() or
-            change_hash_dict[current_bill.bill_id] != current_bill.change_hash
+            not current_bill.bill_id in last_action_dict.keys() or
+            last_action_dict[current_bill.bill_id] != current_bill.last_action
         )
         
         if needs_update:
@@ -51,7 +51,10 @@ def get_bills_for_today(api_url, session_id, account_config):
     return bills
 
 def is_bill_relevant_today(bill, account_config):
-    """Check if a bill is relevant for posting today"""
+    """
+    Check if a bill is relevant for posting today
+    UNUSED AS OF NOW
+    """
     try:
         if datetime.strptime(bill.last_action_date, '%Y-%m-%d').date() == date.today():
             if any(target in bill.last_action for target in account_config.target_actions):

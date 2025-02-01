@@ -35,7 +35,7 @@ def get_bill_by_id(container, bill_id: str):
     return bills[0] if bills else None
 
 def get_all_bill_states(container):
-    query = "SELECT c.bill_id, c.change_hash FROM c"
+    query = "SELECT c.bill_id, c.last_action FROM c"
     bills = list(container.query_items(query=query, enable_cross_partition_query=True))
     return bills if bills else None
 
