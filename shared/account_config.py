@@ -75,7 +75,8 @@ class MOAccountConfig(AccountConfig):
                   "Delivered to Governor",
                   "Signed by Governor",
                   "Governor took no action",
-                  "Delivered to Secretary of State"]
+                  "Delivered to Secretary of State",
+                  "Withdrawn"]
         self.excluded_actions = ["Informal", "Calendar"]
         
     def __repr__(self):
