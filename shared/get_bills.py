@@ -11,6 +11,7 @@ def main(account_config):
     api_url = f"{account_config.legiscan_base_url}{account_config.legiscan_api_key}&op="
     session_id = get_latest_session_id(api_url, account_config)
     bills = get_bills_for_today(api_url, session_id, account_config)
+    logging.info(f'Updating Bills: {len(bills)}')
     process_bills(bills, account_config)
 
 def get_latest_session_id(api_url, account_config):
@@ -24,20 +25,28 @@ def get_bills_for_today(api_url, session_id, account_config):
     db_container = get_cosmos_client(account_config)
     get_bill_list_uri = f'{api_url}{account_config.legiscan_masterlist_uri}{session_id}'
     bill_list = requests.get(get_bill_list_uri).json()['masterlist']
-    #bill_list = dict(sorted(bill_list.items(), key=lambda item: item[1].get('last_action_date', ''), reverse=True))
     bills = []
     
-    stored_bills = get_all_bill_states(db_container)
+    bill_states = get_all_bill_states(db_container)
+    
     last_action_dict = {}
-    if(stored_bills):
-        last_action_dict = {bill['bill_id']: bill['last_action'] for bill in stored_bills}
+    change_hash_dict = {}
+    if bill_states:
+        change_hash_dict = {bill['bill_id']: bill['change_hash'] for bill in bill_states}
+        last_action_dict = {bill['bill_id']: bill['last_action'] for bill in bill_states}
+    
     for b in reversed(bill_list.items()):
-        if b[0] == 'session': continue
+        if b[0] == 'session':
+            continue
         
         current_bill = Bill.from_json(b[1])
         
         needs_update = (
-            not current_bill.bill_id in last_action_dict.keys() or
+            current_bill.bill_id not in change_hash_dict or
+            change_hash_dict[current_bill.bill_id] != current_bill.change_hash
+        )
+        needs_post = (
+            current_bill.bill_id not in last_action_dict or
             last_action_dict[current_bill.bill_id] != current_bill.last_action
         )
         
@@ -45,9 +54,11 @@ def get_bills_for_today(api_url, session_id, account_config):
             bill_details = get_bill_details(api_url, current_bill.bill_id, account_config)
             if bill_details:
                 current_bill.update_from_json(bill_details)
-                current_bill.posted = False
-                current_bill.posted_date = None
+                if needs_post:
+                    current_bill.posted = False
+                    current_bill.posted_date = None
                 bills.append(current_bill)
+    
     return bills
 
 def is_bill_relevant_today(bill, account_config):
