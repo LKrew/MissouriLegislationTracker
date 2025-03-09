@@ -40,23 +40,22 @@ def get_bills_for_today(api_url, session_id, account_config):
             continue
         
         current_bill = Bill.from_json(b[1])
-        
-        needs_update = (
-            current_bill.bill_id not in change_hash_dict or
-            change_hash_dict[current_bill.bill_id] != current_bill.change_hash
-        )
+        # Removing to reduce api calls
+        # needs_update = (
+        #     current_bill.bill_id not in change_hash_dict or
+        #     change_hash_dict[current_bill.bill_id] != current_bill.change_hash
+        # )
         needs_post = (
             current_bill.bill_id not in last_action_dict or
             last_action_dict[current_bill.bill_id] != current_bill.last_action
         )
         
-        if needs_update:
+        if needs_post:
             bill_details = get_bill_details(api_url, current_bill.bill_id, account_config)
             if bill_details:
                 current_bill.update_from_json(bill_details)
-                if needs_post:
-                    current_bill.posted = False
-                    current_bill.posted_date = None
+                current_bill.posted = False
+                current_bill.posted_date = None
                 bills.append(current_bill)
     
     return bills
