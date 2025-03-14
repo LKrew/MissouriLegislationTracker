@@ -41,6 +41,8 @@ class USAccountConfig(AccountConfig):
                                ]
         self.excluded_actions = ["Informal", "Calendar"]
         
+        self.Priority_Actions = {"Became Public Law": 1}
+        
     def __repr__(self):
         return (f"USAccountConfig(db_name={self.db_name}, container_name={self.container_name}, "
                 f"bsky_account_name={self.bsky_user}, bsky_password=****, legiscan_api_key=****)")
@@ -77,6 +79,19 @@ class MOAccountConfig(AccountConfig):
                   "Governor took no action",
                   "Delivered to Secretary of State",
                   "Withdrawn"]
+        self.Priority_Actions = {
+            "Delivered to Secretary of State": 1,
+            "Signed by Governor": 1,
+            "Withdrawn": 1,
+            "Governor took no action": 2,
+            "Delivered to Governor": 2,
+            "Signed by House Speaker": 3,
+            "Signed by Senate President Pro Tem": 3,
+            "Truly Agreed To and Finally Passed": 4,
+            "Third Read and Passed": 4,
+            "First Read": 5,
+            "Prefiled": 5
+        }
         self.excluded_actions = ["Informal", "Calendar"]
         
     def __repr__(self):
@@ -94,7 +109,7 @@ class EOAccountConfig(AccountConfig):
         
         self.container_name = os.getenv('EO_COSMOS_CONTAINER')
         self.api_url = os.getenv('EO_API_URL')
-    
+        
     def __repr__(self):
         return (f"MOAccountConfig(db_name={self.db_name}, container_name={self.container_name}, "
                 f"mo_specific_config={self.mo_specific_config})")

@@ -1,4 +1,5 @@
 from datetime import datetime
+from .account_config import AccountConfig
 import logging
 import azure.cosmos.cosmos_client as cosmos_client
 import azure.cosmos.exceptions as exceptions
@@ -83,12 +84,12 @@ def get_next_order(db):
         return None
     return order[0]
 
-def get_next_bill(db):
+def get_next_bill(db, account_config: AccountConfig):
     query =  "SELECT * FROM c WHERE c.posted = false ORDER BY c.created_date ASC"
     bills = list(db.query_items(query=query, enable_cross_partition_query=True))
     
     for record in bills:
-        record['priority'] = PRIORITY_MAP.get(record["last_action"], 7)
+        record['priority'] = account_config.Priority_Actions.get(record['last_action'], 6) 
     
     sorted_results = sorted(bills, key=lambda x: (
         x["priority"], 
