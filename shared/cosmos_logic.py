@@ -1,8 +1,23 @@
+from datetime import datetime
 import logging
 import azure.cosmos.cosmos_client as cosmos_client
 import azure.cosmos.exceptions as exceptions
 from azure.cosmos.partition_key import PartitionKey
 import os
+
+PRIORITY_MAP = {
+    "Delivered to Secretary of State": 1,
+    "Signed by Governor": 1,
+    "Withdrawn": 1,
+    "Governor took no action": 2,
+    "Delivered to Governor": 2,
+    "Signed by House Speaker": 3,
+    "Signed by Senate President Pro Tem": 3,
+    "Truly Agreed To and Finally Passed": 4,
+    "Third Read and Passed": 4,
+    "First Read": 5,
+    "Prefiled": 5
+}
 
 def get_cosmos_client(account_config):
     db_client = cosmos_client.CosmosClient(os.environ['ACCOUNT_HOST'], os.environ['ACCOUNT_KEY'])
@@ -69,8 +84,18 @@ def get_next_order(db):
     return order[0]
 
 def get_next_bill(db):
-    query =  "SELECT TOP 1 * FROM c WHERE c.posted = false ORDER BY c.created_date ASC"
-    bill = list(db.query_items(query=query, enable_cross_partition_query=True))
+    query =  "SELECT * FROM c WHERE c.posted = false ORDER BY c.created_date ASC"
+    bills = list(db.query_items(query=query, enable_cross_partition_query=True))
+    
+    for record in bills:
+        record['priority'] = PRIORITY_MAP.get(record["last_action"], 7)
+    
+    sorted_results = sorted(bills, key=lambda x: (
+        x["priority"], 
+        datetime.strptime(x["last_action_date"], "%Y-%m-%d")
+    ))
+    bill = sorted_results[0:1]  # Get the first bill with the highest priority
+    
     if len(bill) <= 0:
         return None
     return bill[0]
