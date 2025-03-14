@@ -6,20 +6,6 @@ import azure.cosmos.exceptions as exceptions
 from azure.cosmos.partition_key import PartitionKey
 import os
 
-PRIORITY_MAP = {
-    "Delivered to Secretary of State": 1,
-    "Signed by Governor": 1,
-    "Withdrawn": 1,
-    "Governor took no action": 2,
-    "Delivered to Governor": 2,
-    "Signed by House Speaker": 3,
-    "Signed by Senate President Pro Tem": 3,
-    "Truly Agreed To and Finally Passed": 4,
-    "Third Read and Passed": 4,
-    "First Read": 5,
-    "Prefiled": 5
-}
-
 def get_cosmos_client(account_config):
     db_client = cosmos_client.CosmosClient(os.environ['ACCOUNT_HOST'], os.environ['ACCOUNT_KEY'])
     database_name = account_config.db_name
