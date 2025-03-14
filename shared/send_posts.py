@@ -10,7 +10,7 @@ from .models.Bill import Bill
     
 def post_bill(account_config):
     db_client = get_cosmos_client(account_config)
-    bill = get_next_bill(db_client)
+    bill = get_next_bill(db_client, account_config)
     
     if bill is None:
         return "No Bill To Post"
