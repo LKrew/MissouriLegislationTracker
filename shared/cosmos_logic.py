@@ -75,7 +75,14 @@ def get_next_bill(db, account_config: AccountConfig):
     bills = list(db.query_items(query=query, enable_cross_partition_query=True))
     
     for record in bills:
-        record['priority'] = account_config.Priority_Actions.get(record['last_action'], 6) 
+        # Default priority of 6 if no match found
+        priority = 6
+        # Check each priority action for partial matches
+        for action, action_priority in account_config.Priority_Actions.items():
+            if action.lower() in record['last_action'].lower():
+                priority = action_priority
+                break
+        record['priority'] = priority
     
     sorted_results = sorted(bills, key=lambda x: (
         x["priority"], 
