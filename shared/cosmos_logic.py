@@ -73,7 +73,7 @@ def get_next_order(db):
 def get_next_bill(db, account_config: AccountConfig):
     query =  "SELECT * FROM c WHERE c.posted = false ORDER BY c.created_date ASC"
     bills = list(db.query_items(query=query, enable_cross_partition_query=True))
-    
+    bills = [record for record in bills if record['last_action_date'] != '0000-00-00']
     for record in bills:
         # Default priority of 6 if no match found
         priority = 6
