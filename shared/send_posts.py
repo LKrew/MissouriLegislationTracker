@@ -5,8 +5,37 @@ from .twitter import send_tweet, get_twitter_client
 from .mast import send_post_to_mastodon, get_mastodon_client
 from .cosmos_logic import get_cosmos_client, get_next_bill, upsert_bill
 from .account_config import USAccountConfig, MOAccountConfig
+from .get_bills import get_bill_details
 import logging
+import requests
 from .models.Bill import Bill
+
+def refresh_bill_before_posting(bill: Bill, account_config):
+    """Get fresh bill details from LegiScan API right before posting to ensure accurate sponsors"""
+    try:
+        api_url = f"{account_config.legiscan_base_url}{account_config.legiscan_api_key}&op="
+        bill_details = get_bill_details(api_url, bill.bill_id, account_config)
+        
+        if bill_details:
+            # Preserve posted status while updating everything else
+            old_posted = bill.posted
+            old_posted_date = bill.posted_date
+            
+            bill.update_from_json(bill_details)
+            
+            # Restore posted status
+            bill.posted = old_posted
+            bill.posted_date = old_posted_date
+            
+            logging.info(f"Refreshed bill {bill.bill_id} before posting")
+        else:
+            logging.warning(f"Failed to refresh bill {bill.bill_id}")
+            
+    except Exception as e:
+        logging.error(f"Error refreshing bill {bill.bill_id}: {str(e)}")
+        # Continue with existing data if refresh fails
+    
+    return bill
     
 def post_bill(account_config):
     db_client = get_cosmos_client(account_config)
@@ -16,6 +45,9 @@ def post_bill(account_config):
         return "No Bill To Post"
     bill = Bill.from_json(bill)
     logging.info(f"Running send_posts.post_bill: on bill {bill.bill_number}")
+    
+    # Refresh bill data to get latest sponsors before posting
+    bill = refresh_bill_before_posting(bill, account_config)
     
     post_to_platforms(bill, account_config)
     
