@@ -7,6 +7,26 @@ from .cosmos_logic import get_cosmos_client, get_next_bill, upsert_bill
 from .account_config import USAccountConfig, MOAccountConfig
 import logging
 from .models.Bill import Bill
+import requests
+
+def refresh_bill_data(bill: Bill, account_config):
+    """Get fresh bill details from LegiScan API right before posting"""
+    try:
+        api_url = f"{account_config.legiscan_base_url}{account_config.legiscan_api_key}&op="
+        get_bill_uri = f"{api_url}{account_config.legiscan_bill_uri}{bill.bill_id}"
+        
+        response = requests.get(get_bill_uri)
+        if response.status_code == 200:
+            fresh_bill_data = response.json()['bill']
+            # Update the bill with fresh data while preserving posted status
+            bill.update_from_json(fresh_bill_data)
+            logging.info(f"Refreshed data for bill {bill.bill_id}")
+        else:
+            logging.warning(f"Failed to refresh bill {bill.bill_id}: {response.status_code}")
+    except Exception as e:
+        logging.error(f"Error refreshing bill {bill.bill_id}: {str(e)}")
+    
+    return bill
     
 def post_bill(account_config):
     db_client = get_cosmos_client(account_config)
@@ -16,6 +36,10 @@ def post_bill(account_config):
         return "No Bill To Post"
     bill = Bill.from_json(bill)
     logging.info(f"Running send_posts.post_bill: on bill {bill.bill_number}")
+    
+    # Get fresh bill details right before posting
+    bill = refresh_bill_data(bill, account_config)
+    
     post_to_platforms(bill, account_config)
     
     bill.posted = True

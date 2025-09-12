@@ -68,15 +68,16 @@ class MOAccountConfig(AccountConfig):
         
         self.container_name = os.getenv('MO_COSMOS_CONTAINER')
         self.legiscan_state_id = os.getenv('LEGISCAN_STATE_ID_MO')
-        self.target_actions = ["Prefiled",
+        self.target_actions = [
+                  "Signed by Governor",
+                  "Governor took no action",
+                  "Delivered to Governor",
+                  "Signed by House Speaker",
+                  "Prefiled",
                   "First Read",
                   "Third Read and Passed",
                   "Truly Agreed To and Finally Passed",
                   "Signed by Senate President Pro Tem",
-                  "Signed by House Speaker",
-                  "Delivered to Governor",
-                  "Signed by Governor",
-                  "Governor took no action",
                   "Delivered to Secretary of State",
                   "Withdrawn"]
         self.Priority_Actions = {
