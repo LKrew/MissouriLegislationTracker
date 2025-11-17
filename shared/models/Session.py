@@ -16,6 +16,8 @@ class Session:
 
     @classmethod
     def from_json(cls, data: Dict[str, Any]) -> 'Session':
+        if data is None:
+            return None
         return cls(**data)
 
     def to_dict(self) -> Dict[str, Any]:

@@ -63,7 +63,7 @@ class Bill:
             last_action=data.get('last_action'),
             title=data.get('title'),
             description=data.get('description'),
-            session=Session.from_json(data['session']) if 'session' in data else None,
+            session=Session.from_json(data['session']) if 'session' in data and data['session'] is not None else None,
             state_link=data.get('state_link'),
             completed=data.get('completed'),
             progress=data.get('progress', []),
