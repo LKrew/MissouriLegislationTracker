@@ -70,7 +70,7 @@ class Bill:
             state=data.get('state'),
             state_id=data.get('state_id'),
             bill_number=data.get('bill_number'),
-            bill_type=BillType(int(data.get('bill_type_id'))) if 'bill_type_id' in data else None,
+            bill_type=BillType(int(data.get('bill_type_id'))) if data.get('bill_type_id') is not None else None,
             bill_type_id=data.get('bill_type_id'),
             body=data.get('body'),
             body_id=data.get('body_id'),
