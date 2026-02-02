@@ -78,8 +78,9 @@ def get_next_bill(db, account_config: AccountConfig):
         # Default priority of 6 if no match found
         priority = 6
         # Check each priority action for partial matches
+        last_action = record.get('last_action') or ''
         for action, action_priority in account_config.Priority_Actions.items():
-            if action.lower() in record['last_action'].lower():
+            if action.lower() in last_action.lower():
                 priority = action_priority
                 break
         record['priority'] = priority
