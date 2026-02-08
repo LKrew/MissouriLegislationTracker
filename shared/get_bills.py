@@ -1,9 +1,8 @@
-from asyncio import sleep
+from time import sleep
 import requests
 from .models.Bill import Bill
-from .account_config import AccountConfig
-from .cosmos_logic import get_all_bill_states, get_cosmos_client, upsert_bill,get_bill_by_id
-from datetime import datetime, date, timedelta
+from .database import get_all_bill_states, get_cosmos_client, upsert_bill, get_cached_session_id, cache_session_id
+from datetime import datetime, date
 import logging
 
 def main(account_config):
@@ -15,10 +14,22 @@ def main(account_config):
     process_bills(bills, account_config)
 
 def get_latest_session_id(api_url, account_config):
-    """Get the latest session ID from the LegiScan API"""
+    """Get the latest session ID from the LegiScan API, with 24-hour caching"""
+    db_container = get_cosmos_client(account_config)
+    
+    # Try cache first
+    cached = get_cached_session_id(db_container, account_config.code)
+    if cached:
+        return cached
+    
+    # Cache miss - call API
     get_session_list_uri = f"{api_url}{account_config.legiscan_session_uri}{account_config.legiscan_state_id}"
     sessions = requests.get(get_session_list_uri).json()
-    return sessions['sessions'][0]['session_id']
+    session_id = sessions['sessions'][0]['session_id']
+    
+    # Update cache
+    cache_session_id(db_container, account_config.code, session_id)
+    return session_id
 
 def get_bills_for_today(api_url, session_id, account_config):
     """Get the bills for today from the LegiScan API"""

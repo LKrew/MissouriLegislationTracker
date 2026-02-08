@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 from datetime import date, datetime, timezone
 
 @dataclass
@@ -22,7 +22,11 @@ class ExecutiveOrder:
     body_html_url: str
     json_url: str
     posted: bool = False
-    posted_date: Optional[str] = datetime.now(timezone.utc).isoformat()
+    posted_date: Optional[str] = None
+
+    def __post_init__(self):
+        if self.posted_date is None:
+            self.posted_date = datetime.now(timezone.utc).isoformat()
 
     @classmethod
     def from_json(cls, data: dict) -> 'ExecutiveOrder':
@@ -43,7 +47,9 @@ class ExecutiveOrder:
             not_received_for_publication=data.get('not_received_for_publication'),
             full_text_xml_url=data.get('full_text_xml_url') or '',
             body_html_url=data.get('body_html_url') or '',
-            json_url=data.get('json_url') or ''
+            json_url=data.get('json_url') or '',
+            posted=data.get('posted', False),
+            posted_date=data.get('posted_date')
         )
 
     def to_dict(self) -> dict:

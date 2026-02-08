@@ -1,13 +1,10 @@
 from datetime import datetime, timezone
-from shared.models.Enums import PoliticalParty
-from .bsky import get_client, detailed_post_to_bsky
-from .twitter import send_tweet, get_twitter_client
-from .mast import send_post_to_mastodon, get_mastodon_client
-from .cosmos_logic import get_cosmos_client, get_next_bill, upsert_bill
+from .models.Enums import PoliticalParty
+from .social import get_client, detailed_post_to_bsky, send_tweet, get_twitter_client, send_post_to_mastodon, get_mastodon_client
+from .database import get_cosmos_client, get_next_bill, upsert_bill
 from .account_config import USAccountConfig, MOAccountConfig
 from .get_bills import get_bill_details
 import logging
-import requests
 from .models.Bill import Bill
 
 def refresh_bill_before_posting(bill: Bill, account_config):
@@ -61,7 +58,7 @@ def post_bill(account_config):
 
 def format_state_bill_body(bill: Bill):
     newline = '\n'
-    sponsors = [f"{obj.person.name} ({obj.person.party[0]}) district {obj.person.district}" for obj in bill.sponsors]
+    sponsors = [f"{obj.person.name} ({obj.person.party.name[0]}) district {obj.person.district}" for obj in bill.sponsors]
     if len(sponsors) == 1:
         sponsor_string = f"Sponsor: {sponsors[0]}"
     else:

@@ -1,10 +1,10 @@
 import logging
-from atproto import Client, client_utils, models
-from .account_config import AccountConfig, MOAccountConfig, USAccountConfig
-from .models.Bill import Bill
-from .models.Enums import PartyCode, PoliticalParty
-from .helpers import split_string_into_chunks
 import math
+from atproto import Client, client_utils, models
+from ..account_config import AccountConfig, MOAccountConfig, USAccountConfig
+from ..models.Bill import Bill
+from ..models.Enums import PartyCode, PoliticalParty
+from ..helpers import split_string_into_chunks
 
 def get_sponsor_counts(sponsors):
     party_counts = {
@@ -97,7 +97,7 @@ def detailed_post_to_bsky(bill: Bill, client: Client, account_config: AccountCon
                     root = parent
 
 def create_multi_posts(body, facets):
-    logging.ingo('Creating multi posts')
+    logging.info('Creating multi posts')
     chunks = split_string_into_chunks(body, 300)
     multi_posts = []
     chunk_indexes = [0]

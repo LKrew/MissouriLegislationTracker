@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 import requests
 import logging
 from atproto import client_utils, models
-from .cosmos_logic import get_cosmos_client, upsert_executive_order, get_next_order, get_all_orders
-from .models.ExecutiveOrders.ExecutiveOrder import ExecutiveOrder
-from .bsky import get_client
+from .database import get_cosmos_client, upsert_executive_order, get_next_order, get_all_orders
+from .models.ExecutiveOrder import ExecutiveOrder
+from .social import get_client
 
 def fetch_executive_orders(api_url: str):
     try:

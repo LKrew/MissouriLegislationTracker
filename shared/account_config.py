@@ -10,7 +10,7 @@ class AccountConfig:
         self.legiscan_masterlist_uri = os.getenv('LEGISCAN_MASTERLIST_URI')
         
     def __repr__(self):
-        return (f"AccountConfig(db_name={self.db_name}, container_name={self.container_name})")
+        return f"AccountConfig(db_name={self.db_name})"
 
 
 class USAccountConfig(AccountConfig):
@@ -42,10 +42,6 @@ class USAccountConfig(AccountConfig):
         self.excluded_actions = ["Informal", "Calendar"]
         
         self.Priority_Actions = {"Became Public Law": 1}
-        
-    def __repr__(self):
-        return (f"USAccountConfig(db_name={self.db_name}, container_name={self.container_name}, "
-                f"bsky_account_name={self.bsky_user}, bsky_password=****, legiscan_api_key=****)")
 
 
 class MOAccountConfig(AccountConfig):
@@ -95,9 +91,6 @@ class MOAccountConfig(AccountConfig):
         }
         self.excluded_actions = ["Informal", "Calendar"]
         
-    def __repr__(self):
-        return (f"MOAccountConfig(db_name={self.db_name}, container_name={self.container_name}, "
-                f"mo_specific_config={self.mo_specific_config})")
         
 class EOAccountConfig(AccountConfig):
     def __init__(self):
@@ -110,7 +103,3 @@ class EOAccountConfig(AccountConfig):
         
         self.container_name = os.getenv('EO_COSMOS_CONTAINER')
         self.api_url = os.getenv('EO_API_URL')
-        
-    def __repr__(self):
-        return (f"MOAccountConfig(db_name={self.db_name}, container_name={self.container_name}, "
-                f"mo_specific_config={self.mo_specific_config})")

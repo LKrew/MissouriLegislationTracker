@@ -1,5 +1,5 @@
-from datetime import datetime
-from .account_config import AccountConfig
+from datetime import datetime, timezone, timedelta
+from ..account_config import AccountConfig
 import logging
 import azure.cosmos.cosmos_client as cosmos_client
 import azure.cosmos.exceptions as exceptions
@@ -36,8 +36,30 @@ def get_bill_by_id(container, bill_id: str):
     bills = list(container.query_items(query=query, enable_cross_partition_query=True))
     return bills[0] if bills else None
 
+def get_cached_session_id(container, state_code: str, cache_hours: int = 24):
+    """Get cached session_id if less than cache_hours old"""
+    query = f"SELECT * FROM c WHERE c.id = 'session_cache_{state_code}'"
+    results = list(container.query_items(query=query, enable_cross_partition_query=True))
+    
+    if results:
+        cached = results[0]
+        cached_time = datetime.fromisoformat(cached['updated_at'].replace('Z', '+00:00'))
+        if datetime.now(timezone.utc) - cached_time < timedelta(hours=cache_hours):
+            logging.info(f"Using cached session_id for {state_code}: {cached['session_id']}")
+            return cached['session_id']
+    return None
+
+def cache_session_id(container, state_code: str, session_id: int):
+    """Store session_id with timestamp"""
+    container.upsert_item({
+        'id': f'session_cache_{state_code}',
+        'session_id': session_id,
+        'updated_at': datetime.now(timezone.utc).isoformat()
+    })
+    logging.info(f"Cached session_id for {state_code}: {session_id}")
+
 def get_all_bill_states(container):
-    query = "SELECT c.bill_id, c.last_action, c.change_hash FROM c"
+    query = "SELECT c.bill_id, c.last_action, c.change_hash FROM c WHERE c.bill_id != null"
     bills = list(container.query_items(query=query, enable_cross_partition_query=True))
     return bills if bills else None
 

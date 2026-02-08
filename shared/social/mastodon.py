@@ -1,6 +1,6 @@
 from mastodon import Mastodon
-from .helpers import split_string_into_chunks
-import os
+from ..helpers import split_string_into_chunks
+
 def get_mastodon_client(account_config):
     mastodon = Mastodon(
         client_id = account_config.mast_client_id,
